@@ -7,13 +7,14 @@ using Newtonsoft.Json.Linq;
 public class GameLogic : MonoBehaviour {
 
   const int MaxConnections = 4;
+  private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
 
   public GameObject PlayerPrefab;
+  public List<GameObject> SpawnPoints = new List<GameObject>();
 
   // this is the code that is required to connect to the game.
   public string Code;
 
-  private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
 
   void Awake() {
     AirConsole.instance.onReady += onReady;
