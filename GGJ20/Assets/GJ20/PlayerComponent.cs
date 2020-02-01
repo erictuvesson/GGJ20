@@ -7,13 +7,10 @@ public class PlayerComponent : MonoBehaviour {
 
   private Vector3 lastInputVelocity = Vector3.zero;
 
-  // Start is called before the first frame update
-  void Start()
-  {
+  void Start() {
     
   }
 
-  // Update is called once per frame
   void Update() {
     // TODO: Add rigidbody and move that instead, that allows for easier collision handling.
     transform.position = transform.position + this.lastInputVelocity * 0.1f;

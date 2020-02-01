@@ -10,12 +10,16 @@ public class GameLogic : MonoBehaviour {
 
   public GameObject PlayerPrefab;
 
+  public string ID;
+
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
 
   void Awake() {
     AirConsole.instance.onConnect += onConnect;
     AirConsole.instance.onDisconnect += onDisconnect;
     AirConsole.instance.onMessage += onMessage;
+
+    this.ID = AirConsole.instance.getDeviceId();
   }
 
   void onConnect(int deviceID) {
@@ -23,6 +27,22 @@ public class GameLogic : MonoBehaviour {
     if (players.Count <= MaxConnections && !this.players.ContainsKey(deviceID)) {
       var prefab = Instantiate(this.PlayerPrefab);
       this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
+
+      var message = new {
+        action = "connect",
+        status = "success",
+        color = "#FF0000",
+        colorNmae = "Red"
+      };
+
+      AirConsole.instance.Message(deviceID, message);
+    } else {
+      var message = new {
+        action = "connect",
+        status = "failed"
+      };
+
+      AirConsole.instance.Message(deviceID, message);
     }
   }
 
