@@ -60,3 +60,16 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+GGJ20/Temp
+GGJ20/Library/Artifacts/
+
+*.log
+
+
+# What is this?
+GGJ20/Library/CurrentLayout-default.dwlt
+GGJ20/Library/EditorInstance.json
+GGJ20/Library/LastSceneManagerSetup.txt
+*.log
+GGJ20/Library/CurrentLayout-default.dwlt
