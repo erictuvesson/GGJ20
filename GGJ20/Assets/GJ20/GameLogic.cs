@@ -11,6 +11,7 @@ public class GameLogic : MonoBehaviour {
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
   private float spawnTimer = 0;
 
+  private List<PlaneComponent> planes = new List<PlaneComponent>();
 
   public GameObject PlayerPrefab;
   public GameObject PlanePrefab;
@@ -43,6 +44,18 @@ public class GameLogic : MonoBehaviour {
       var plane  = prefab.GetComponent<PlaneComponent>();
       prefab.transform.position = planeStart;
       plane.target = planeEnd;
+
+      planes.Add(plane);
+    }
+
+    for (var i = 0; i < this.planes.Count;) {
+      var plane = this.planes[i];
+      if (plane.distanceToTarget() < 3) {
+        this.planes.RemoveAt(i);
+        Destroy(plane.gameObject);
+      } else {
+        i++;
+      }
     }
   }
 
