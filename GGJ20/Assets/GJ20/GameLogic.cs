@@ -10,16 +10,19 @@ public class GameLogic : MonoBehaviour {
 
   public GameObject PlayerPrefab;
 
-  public string ID;
+  public string Code;
 
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
 
   void Awake() {
+    AirConsole.instance.onReady += onReady;
     AirConsole.instance.onConnect += onConnect;
     AirConsole.instance.onDisconnect += onDisconnect;
     AirConsole.instance.onMessage += onMessage;
+  }
 
-    // this.ID = AirConsole.instance.getDeviceId();
+  void onReady(string code) {
+    this.Code = code;
   }
 
   void onConnect(int deviceID) {
@@ -62,6 +65,7 @@ public class GameLogic : MonoBehaviour {
 
   void OnDestroy() {
     if (AirConsole.instance != null) {
+      AirConsole.instance.onReady -= onReady;
       AirConsole.instance.onConnect -= onConnect;
       AirConsole.instance.onDisconnect -= onDisconnect;
       AirConsole.instance.onMessage -= onMessage;
