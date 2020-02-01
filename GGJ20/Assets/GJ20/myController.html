@@ -75,6 +75,10 @@
               color = payload.color;
               colorName = payload.colorName;
 
+              const colorElem = document.getElementsByClassName("header__color");
+              colorElem.style.background = payload.color;
+              colorElem.innerHtml = payload.colorName;
+
               document.getElementById("state__connecting").style.display = "none";
               document.getElementById("state__playing").style.display = "block";
             } else {
@@ -137,7 +141,9 @@
 <body onload="window.app = new App()">
 
   <div id="state__connecting">
-
+    <div class="header">
+      <span>You are not connected yet.</span>
+    </div>
   </div>
 
   <div id="state__playing" style="display: none;">
