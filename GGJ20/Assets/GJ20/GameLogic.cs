@@ -10,6 +10,7 @@ public class GameLogic : MonoBehaviour {
 
   public GameObject PlayerPrefab;
 
+  // this is the code that is required to connect to the game.
   public string Code;
 
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
@@ -35,7 +36,7 @@ public class GameLogic : MonoBehaviour {
         action = "connect",
         status = "success",
         color = "#FF0000",
-        colorNmae = "Red"
+        colorName = "Red"
       };
 
       AirConsole.instance.Message(deviceID, message);

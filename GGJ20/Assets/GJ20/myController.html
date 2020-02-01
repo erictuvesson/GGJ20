@@ -55,6 +55,11 @@
   
   <script type="text/javascript">
 
+    var color = "gray";
+    var colorName = "";
+    var velocityX = 0;
+    var velocityY = 0;
+
     function App() {
 
     /* JavaScript / Functionality. Add functions and evens here */ 
@@ -63,6 +68,25 @@
       
       this.airconsole.onMessage = function (payload) {
         console.log(payload);
+
+        switch (payload.action) {
+          case "connect": {
+            if (payload.status == "success") {
+              color = payload.color;
+              colorName = payload.colorName;
+
+              document.getElementById("state__connecting").style.display = "none";
+              document.getElementById("state__playing").style.display = "block";
+            } else {
+              color = "gray";
+              colorName = null;
+
+              document.getElementById("state__connecting").style.display = "block";
+              document.getElementById("state__playing").style.display = "none";
+            }
+            break;
+          }
+        }
       };
 
       /*
@@ -89,12 +113,7 @@
         }
       }
     }
-
-    var color = "gray";
-    var colorName = "";
-    var velocityX = 0;
-    var velocityY = 0;
-
+    
     App.prototype.move_x = function (value) {
       velocityX = value;
       window.app.update();
@@ -117,11 +136,11 @@
 </head>
 <body onload="window.app = new App()">
 
-  <div id="state__connecting" style="display: none;">
+  <div id="state__connecting">
 
   </div>
 
-  <div id="state__playing">
+  <div id="state__playing" style="display: none;">
     <div class="header">
       <span>You are color</span>
       <div class="header__color"></div>
