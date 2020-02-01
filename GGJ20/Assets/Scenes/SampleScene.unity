@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e37d83ebce05ad74683fd3228dde9e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  browserStartMode: 4
+  browserStartMode: 0
   controllerHtml: {fileID: 4900000, guid: 610685957a0274c1b82e756df1ce61e7, type: 3}
   autoScaleCanvas: 1
 --- !u!4 &1752077482
@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfc915ad041364b8fad7cf3be1d73f95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 1745638704628313045, guid: e4a29fed287cd4434985b3fc4841e5ea,
+  PlayerPrefab: {fileID: 1745638704628313045, guid: 29c48917f1e598146a80f913d6fb7bbc,
     type: 3}
   Code: 
 --- !u!4 &1975233348

@@ -52,7 +52,7 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
-    Debug.Log("Connected; Failed " + deviceID);
+      Debug.Log("Connected; Failed " + deviceID);
     }
   }
 
