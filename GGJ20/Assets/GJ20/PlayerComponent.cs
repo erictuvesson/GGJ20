@@ -19,7 +19,7 @@ public class PlayerComponent : MonoBehaviour {
   public Renderer renderComponent;
 
   public Color Color;
-  public float Speed = 1.0f;
+  public float Speed = 2.0f;
 
   void Start() {
     renderComponent = GetComponentInChildren<Renderer>();

@@ -7,11 +7,16 @@ using Newtonsoft.Json.Linq;
 public class GameLogic : MonoBehaviour {
 
   const int MaxConnections = 4;
+
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
+  private float spawnTimer = 0;
+
 
   public GameObject PlayerPrefab;
+  public GameObject PlanePrefab;
   public List<GameObject> SpawnPoints = new List<GameObject>();
-  public UnityEngine.UI.Text Text;
+  public UnityEngine.UI.Text ConnectText;
+  public UnityEngine.UI.Text ScoreText;
   
   public List<GameObject> PlaneStartPoints = new List<GameObject>();
   public List<GameObject> PlaneEndPoints = new List<GameObject>();
@@ -28,6 +33,21 @@ public class GameLogic : MonoBehaviour {
       // var devices = AirConsole.instance.getControllerDeviceIds();
     }
 
+    spawnTimer += Time.deltaTime;
+    if (spawnTimer > 3) {
+      spawnTimer -= 3;
+
+      var planeStartIndex = Random.Range(0, PlaneStartPoints.Count);
+      var planeEndIndex   = Random.Range(0, PlaneEndPoints.Count);
+
+      var planeStart = PlaneStartPoints[planeStartIndex].transform.position;
+      var planeEnd   = PlaneEndPoints[planeEndIndex].transform.position;
+
+      var prefab = Instantiate(this.PlanePrefab);
+      var plane  = prefab.GetComponent<PlaneComponent>();
+      prefab.transform.position = planeStart;
+      plane.target = planeEnd;
+    }
   }
 
   void OnDrawGizmos() {
@@ -39,7 +59,7 @@ public class GameLogic : MonoBehaviour {
   }
 
   void onReady(string code) {
-    this.Text.text = "Connect using code " + code;
+    this.ConnectText.text = "Connect using code " + code;
   }
 
   void onConnect(int deviceID) {
