@@ -16,12 +16,14 @@ public class PlayerComponent : MonoBehaviour {
   }
 
   private Vector3 lastInputVelocity = Vector3.zero;
+  public Renderer renderComponent;
 
   public Color Color;
   public float Speed = 1.0f;
 
   void Start() {
-    
+    renderComponent = GetComponentInChildren<Renderer>();
+    renderComponent.material.SetColor("_Color", this.Color);
   }
 
   void Update() {
