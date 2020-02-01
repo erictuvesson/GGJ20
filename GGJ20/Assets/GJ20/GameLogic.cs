@@ -4,20 +4,47 @@ using UnityEngine;
 using NDream.AirConsole;
 using Newtonsoft.Json.Linq;
 
-public class GameLogic : MonoBehaviour
-{
-    void Awake() {
-        AirConsole.instance.onMessage += onMessage;
-    }
+public class GameLogic : MonoBehaviour {
 
-    void onMessage(int fromDeviceID, JToken data) {
-      Debug.Log("message from " + fromDeviceID + ", data: " + data);
-        
-    }
+  const int MaxConnections = 4;
 
-    void OnDestroy() {
-      if (AirConsole.instance != null) {
-        AirConsole.instance.onMessage -= onMessage;
-      }
+  public GameObject PlayerPrefab;
+
+  private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
+
+  void Awake() {
+    AirConsole.instance.onConnect += onConnect;
+    AirConsole.instance.onDisconnect += onDisconnect;
+    AirConsole.instance.onMessage += onMessage;
+  }
+
+  void onConnect(int deviceID) {
+    Debug.Log("Connected " + deviceID);
+    if (players.Count <= MaxConnections && !this.players.ContainsKey(deviceID)) {
+      var prefab = Instantiate(this.PlayerPrefab);
+      this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
     }
+  }
+
+  void onDisconnect(int deviceID) {
+    if (this.players.TryGetValue(deviceID, out var player)) {
+      player.onDisconnect();
+      this.players.Remove(deviceID);
+    }
+  }
+
+  void onMessage(int deviceID, JToken data) {
+    Debug.Log("message from " + deviceID + ", data: " + data);
+    if (this.players.TryGetValue(deviceID, out var player)) {
+      player.onMessage(data);
+    }
+  }
+
+  void OnDestroy() {
+    if (AirConsole.instance != null) {
+      AirConsole.instance.onConnect -= onConnect;
+      AirConsole.instance.onDisconnect -= onDisconnect;
+      AirConsole.instance.onMessage -= onMessage;
+    }
+  }
 }
