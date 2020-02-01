@@ -13,10 +13,6 @@ public class GameLogic : MonoBehaviour {
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text Text;
 
-  // this is the code that is required to connect to the game.
-  public string Code;
-
-
   void Awake() {
     AirConsole.instance.onReady += onReady;
     AirConsole.instance.onConnect += onConnect;
@@ -25,8 +21,7 @@ public class GameLogic : MonoBehaviour {
   }
 
   void onReady(string code) {
-    this.Code = code;
-    Debug.Log("Auth Code: " + code);
+    this.Text.text = "Connect using code " + code;
   }
 
   void onConnect(int deviceID) {
