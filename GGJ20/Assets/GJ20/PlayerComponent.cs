@@ -5,7 +5,19 @@ using Newtonsoft.Json.Linq;
 
 public class PlayerComponent : MonoBehaviour {
 
+  public static (Color, string) GetColor(int index) {
+    switch (index) {
+      default:
+      case 1: return (Color.red, "Red");
+      case 2: return (Color.green, "Green");
+      case 3: return (Color.blue, "Blue");
+      case 4: return (Color.yellow, "Yellow");
+    }
+  }
+
   private Vector3 lastInputVelocity = Vector3.zero;
+
+  public Color Color;
 
   void Start() {
     

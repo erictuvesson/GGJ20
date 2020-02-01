@@ -76,7 +76,7 @@
               colorName = payload.colorName;
 
               const colorElem = document.getElementById("state__playing__color");
-              colorElem.style.background = payload.color;
+              colorElem.style.background = "#" + payload.color;
               colorElem.innerHTML = payload.colorName;
 
               document.getElementById("state__connecting").style.display = "none";
@@ -165,6 +165,7 @@
             class="action"
             ontouchstart="window.app.move_y(1)"
             ontouchend="window.app.move_y(0)"
+            onmouseleave="window.app.move_y(0)"
           >UP</td>
           <td></td>
         </tr>
@@ -173,12 +174,14 @@
             class="action"
             ontouchstart="window.app.move_x(-1)"
             ontouchend="window.app.move_x(0)"
+            onmouseleave="window.app.move_x(0)"
           >LEFT</td>
           <td></td>
           <td
             class="action"
             ontouchstart="window.app.move_x(1)"
             ontouchend="window.app.move_x(0)"
+            onmouseleave="window.app.move_x(0)"
           >RIGHT</td>
         </tr>
         <tr>
@@ -187,6 +190,7 @@
             class="action"
             ontouchstart="window.app.move_y(-1)"
             ontouchend="window.app.move_y(0)"
+            onmouseleave="window.app.move_y(0)"
           >DOWN</td>
           <td></td>
         </tr>
