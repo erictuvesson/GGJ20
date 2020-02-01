@@ -12,12 +12,30 @@ public class GameLogic : MonoBehaviour {
   public GameObject PlayerPrefab;
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text Text;
+  
+  public List<GameObject> PlaneStartPoints = new List<GameObject>();
+  public List<GameObject> PlaneEndPoints = new List<GameObject>();
 
   void Awake() {
     AirConsole.instance.onReady += onReady;
     AirConsole.instance.onConnect += onConnect;
     AirConsole.instance.onDisconnect += onDisconnect;
     AirConsole.instance.onMessage += onMessage;
+  }
+
+  void Update() {
+    if (Input.GetKeyDown("space")) {
+      // var devices = AirConsole.instance.getControllerDeviceIds();
+    }
+
+  }
+
+  void OnDrawGizmos() {
+    foreach (var start in PlaneStartPoints) {
+      foreach (var end in PlaneEndPoints) {
+        Gizmos.DrawLine(start.transform.position, end.transform.position);
+      }
+    }
   }
 
   void onReady(string code) {
