@@ -31,10 +31,15 @@ public class GameLogic : MonoBehaviour {
   void onConnect(int deviceID) {
     Debug.Log("Connected " + deviceID);
     if (players.Count <= MaxConnections && !this.players.ContainsKey(deviceID)) {
+      var index = this.players.Count;
+
       var prefab = Instantiate(this.PlayerPrefab);
+      prefab.transform.position = SpawnPoints[index].transform.position;
+
       this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
 
-      var (color, colorName) = PlayerComponent.GetColor(this.players.Count);
+      // Get Color
+      var (color, colorName) = PlayerComponent.GetColor(index + 1);
       this.players[deviceID].Color = color;
 
       var message = new {
@@ -45,7 +50,7 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
-    Debug.Log("Connected; Success " + deviceID);
+      Debug.Log("Connected; Success " + deviceID);
     } else {
       var message = new {
         action = "connect",
