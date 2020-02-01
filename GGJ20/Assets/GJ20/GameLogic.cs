@@ -11,6 +11,7 @@ public class GameLogic : MonoBehaviour {
 
   public GameObject PlayerPrefab;
   public List<GameObject> SpawnPoints = new List<GameObject>();
+  public UnityEngine.UI.Text Text;
 
   // this is the code that is required to connect to the game.
   public string Code;
