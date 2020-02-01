@@ -40,6 +40,7 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
+    Debug.Log("Connected; Success " + deviceID);
     } else {
       var message = new {
         action = "connect",
@@ -47,6 +48,7 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
+    Debug.Log("Connected; Failed " + deviceID);
     }
   }
 

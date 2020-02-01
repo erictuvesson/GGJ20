@@ -66,8 +66,8 @@
 
       this.airconsole = new AirConsole({ "orientation": "portrait" });
       
-      this.airconsole.onMessage = function (payload) {
-        console.log(payload);
+      this.airconsole.onMessage = function (device_id, payload) {
+        console.log("payload: " + payload);
 
         switch (payload.action) {
           case "connect": {
@@ -75,9 +75,9 @@
               color = payload.color;
               colorName = payload.colorName;
 
-              const colorElem = document.getElementsByClassName("header__color");
+              const colorElem = document.getElementById("state__playing__color");
               colorElem.style.background = payload.color;
-              colorElem.innerHtml = payload.colorName;
+              colorElem.innerHTML = payload.colorName;
 
               document.getElementById("state__connecting").style.display = "none";
               document.getElementById("state__playing").style.display = "block";
@@ -142,14 +142,14 @@
 
   <div id="state__connecting">
     <div class="header">
-      <span>You are not connected yet.</span>
+      <span>You are not connected yet. :(</span>
     </div>
   </div>
 
   <div id="state__playing" style="display: none;">
     <div class="header">
       <span>You are color</span>
-      <div class="header__color"></div>
+      <div id="state__playing__color" class="header__color"></div>
     </div>
 
     <div class="info">
@@ -164,7 +164,7 @@
           <td
             class="action"
             ontouchstart="window.app.move_y(1)"
-            ontouchstop="window.app.move_y(0)"
+            ontouchend="window.app.move_y(0)"
           >UP</td>
           <td></td>
         </tr>
@@ -172,13 +172,13 @@
           <td
             class="action"
             ontouchstart="window.app.move_x(-1)"
-            ontouchstop="window.app.move_x(0)"
+            ontouchend="window.app.move_x(0)"
           >LEFT</td>
           <td></td>
           <td
             class="action"
             ontouchstart="window.app.move_x(1)"
-            ontouchstop="window.app.move_x(0)"
+            ontouchend="window.app.move_x(0)"
           >RIGHT</td>
         </tr>
         <tr>
@@ -186,7 +186,7 @@
           <td
             class="action"
             ontouchstart="window.app.move_y(-1)"
-            ontouchstop="window.app.move_y(0)"
+            ontouchend="window.app.move_y(0)"
           >DOWN</td>
           <td></td>
         </tr>

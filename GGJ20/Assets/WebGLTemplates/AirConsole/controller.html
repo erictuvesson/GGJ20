@@ -55,14 +55,42 @@
   
   <script type="text/javascript">
 
+    var color = "gray";
+    var colorName = "";
+    var velocityX = 0;
+    var velocityY = 0;
+
     function App() {
 
     /* JavaScript / Functionality. Add functions and evens here */ 
 
       this.airconsole = new AirConsole({ "orientation": "portrait" });
       
-      this.airconsole.onMessage = function (payload) {
-        console.log(payload);
+      this.airconsole.onMessage = function (device_id, payload) {
+        console.log("payload: " + payload);
+
+        switch (payload.action) {
+          case "connect": {
+            if (payload.status == "success") {
+              color = payload.color;
+              colorName = payload.colorName;
+
+              const colorElem = document.getElementById("state__playing__color");
+              colorElem.style.background = payload.color;
+              colorElem.innerHTML = payload.colorName;
+
+              document.getElementById("state__connecting").style.display = "none";
+              document.getElementById("state__playing").style.display = "block";
+            } else {
+              color = "gray";
+              colorName = null;
+
+              document.getElementById("state__connecting").style.display = "block";
+              document.getElementById("state__playing").style.display = "none";
+            }
+            break;
+          }
+        }
       };
 
       /*
@@ -89,12 +117,7 @@
         }
       }
     }
-
-    var color = "gray";
-    var colorName = "";
-    var velocityX = 0;
-    var velocityY = 0;
-
+    
     App.prototype.move_x = function (value) {
       velocityX = value;
       window.app.update();
@@ -117,14 +140,16 @@
 </head>
 <body onload="window.app = new App()">
 
-  <div id="state__connecting" style="display: none;">
-
+  <div id="state__connecting">
+    <div class="header">
+      <span>You are not connected yet. :(</span>
+    </div>
   </div>
 
-  <div id="state__playing">
+  <div id="state__playing" style="display: none;">
     <div class="header">
       <span>You are color</span>
-      <div class="header__color"></div>
+      <div id="state__playing__color" class="header__color"></div>
     </div>
 
     <div class="info">
@@ -138,22 +163,22 @@
           <td></td>
           <td
             class="action"
-            ontouchstart="window.app.move_x(1)"
-            ontouchstop="window.app.move_x(0)"
+            ontouchstart="window.app.move_y(1)"
+            ontouchend="window.app.move_y(0)"
           >UP</td>
           <td></td>
         </tr>
         <tr>
           <td
             class="action"
-            ontouchstart="window.app.move_y(-1)"
-            ontouchstop="window.app.move_y(0)"
+            ontouchstart="window.app.move_x(-1)"
+            ontouchend="window.app.move_x(0)"
           >LEFT</td>
           <td></td>
           <td
             class="action"
             ontouchstart="window.app.move_x(1)"
-            ontouchstop="window.app.move_x(0)"
+            ontouchend="window.app.move_x(0)"
           >RIGHT</td>
         </tr>
         <tr>
@@ -161,7 +186,7 @@
           <td
             class="action"
             ontouchstart="window.app.move_y(-1)"
-            ontouchstop="window.app.move_y(0)"
+            ontouchend="window.app.move_y(0)"
           >DOWN</td>
           <td></td>
         </tr>
