@@ -6,15 +6,49 @@
   <style type=text/css>
   /* the style sheet dictates what our elements (buttons, backgrounds etc.) will look like. */
 
-    #interact-button {
-      background-color: red;
-      position: absolute;
-      top: 20%;
-      left: 10%;
-      width: 80%;
-      height: 60%;
-      background-size: contain;
-      background-repeat: no-repeat;
+    body {
+      margin: 0;
+    }
+
+    .header {
+      font-size: 24;
+      text-align: center;
+    }
+
+    .header span {
+      padding: 16px 0;
+    display: block;
+    }
+
+    .header .header__color {
+      width: 100%;
+      height: 32px;
+      background-color: gray;
+    }
+
+    .info {
+      margin: 16px;
+      font-size: 20px;
+    }
+
+    .controller {
+      position: fixed;
+      margin: 16px;
+      margin-bottom: 32px;
+      bottom: 0;
+    }
+    .controller table {
+      width: 100%;
+      table-layout: fixed;
+    }
+    .controller table tr {
+      /* height: 64px; */
+      height: 96px;
+    }
+    .controller table tr td.action {
+      background-color: lightgray;
+      border-radius: 6px;
+      text-align: center;
     }
 
   </style>
@@ -52,15 +86,66 @@
       }
     }
 
-    App.prototype.sendMessageToScreen = function (msg) {
-      console.log("interact");
-      this.airconsole.message(AirConsole.SCREEN, { "action": msg });
+    var velocityX = 0;
+    var velocityY = 0;
+
+    App.prototype.move_x = function (value) {
+      velocityX = value;
+      window.app.update();
+    };
+    App.prototype.move_y = function (value) {
+      velocityY = value;
+      window.app.update();
+    };
+
+    App.prototype.update = function () {
+      this.airconsole.message(AirConsole.SCREEN, {
+        "action": "move",
+        "x": velocityX,
+        "y": velocityY
+      });
     }
+    
 
   </script>
 </head>
 <body onload="window.app = new App()">
-  <!-- Add your HTML elements here -->
-  <div id="interact-button" ontouchstart="window.app.sendMessageToScreen('interact')"></div>
+
+  <div id="state__connecting" style="display: none;">
+
+  </div>
+
+  <div id="state__playing">
+    <div class="header">
+      <span>You are color</span>
+      <div class="header__color"></div>
+    </div>
+
+    <div class="info">
+      <span><!-- more information here --></span>
+    </div>
+
+    <div class="controller">
+      <!-- IRL I would make this a flexbox, but where is the time for that? -->
+      <table>
+        <tr>
+          <td></td>
+          <td class="action" ontouchstart="window.app.move_x1)">UP</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="action" ontouchstart="window.app.move_y(-1)">LEFT</td>
+          <td></td>
+          <td class="action" ontouchstart="window.app.move_x(1)">RIGHT</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="action" ontouchstart="window.app.move_y(-1)">DOWN</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  </div
+
 </body>
 </html>
