@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class PlaneComponent : MonoBehaviour {
 
+    public ParticleSystem particleSystem;
     public Vector3 target;
     public float Speed = 1.0f;
-
-    public float distanceToTarget() {
-        return Vector3.Distance(this.transform.position, this.target);
-    }
 
     void Update() {
         this.transform.LookAt(target);   
         this.transform.position = this.transform.position + (this.transform.forward * 0.025f) * this.Speed;
+    }
+
+    public void Saved() {
+        // Destroy(gameObject);
+
+        particleSystem.Stop();
+    }
+
+    public float distanceToTarget() {
+        return Vector3.Distance(this.transform.position, this.target);
     }
 }

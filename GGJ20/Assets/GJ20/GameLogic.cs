@@ -54,6 +54,19 @@ public class GameLogic : MonoBehaviour {
         this.planes.RemoveAt(i);
         Destroy(plane.gameObject);
       } else {
+
+        foreach (var player in this.players) {
+          var playerPosition = player.Value.transform.position;
+
+          var distance = Vector3.Distance(playerPosition, plane.transform.position);
+          if (distance < 3) {
+            player.Value.Score();
+            this.planes.RemoveAt(i);
+            plane.Saved();
+            break;
+          }
+        }
+
         i++;
       }
     }
@@ -79,10 +92,10 @@ public class GameLogic : MonoBehaviour {
       var prefab = Instantiate(this.PlayerPrefab);
       prefab.transform.position = SpawnPoints[index].transform.position;
 
-      this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
-
-      // Get Color
       var (color, colorName) = GetColor(index);
+
+      this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
+      this.players[deviceID].DeviceID = deviceID;
       this.players[deviceID].Color = color;
 
       var message = new {

@@ -9,6 +9,7 @@
     body {
       margin: 0;
       margin-top: 32px;
+      background-color: #000000;
     }
 
     .header {
@@ -18,7 +19,8 @@
 
     .header span {
       padding: 16px 0;
-    display: block;
+      display: block;
+      color: #ffffff;
     }
 
     .header .header__color {
@@ -30,6 +32,7 @@
     .info {
       margin: 16px;
       font-size: 20px;
+      color: #ffffff;
     }
 
     .controller {
@@ -89,6 +92,12 @@
               document.getElementById("state__connecting").style.display = "block";
               document.getElementById("state__playing").style.display = "none";
             }
+            break;
+          }
+
+          case "score": {
+            const scoreElem = document.getElementById("info__score");
+            scoreElem.innerHTML = "Saved: " + payload.points;
             break;
           }
         }
@@ -161,7 +170,7 @@
     </div>
 
     <div class="info">
-      <span><!-- more information here  --></span>
+      <span id="info__score"><!-- more information here  --></span>
     </div>
 
     <div class="controller">

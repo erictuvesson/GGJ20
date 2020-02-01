@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NDream.AirConsole;
 using Newtonsoft.Json.Linq;
 
 public class PlayerComponent : MonoBehaviour {
@@ -8,8 +9,10 @@ public class PlayerComponent : MonoBehaviour {
   private Vector3 lastInputVelocity = Vector3.zero;
   public Renderer renderComponent;
 
+  public int DeviceID;
   public Color Color;
   public float Speed = 2.0f;
+  public int Points = 0;
 
   void Start() {
     renderComponent = GetComponentInChildren<Renderer>();
@@ -19,6 +22,17 @@ public class PlayerComponent : MonoBehaviour {
   void Update() {
     // TODO: Add rigidbody and move that instead, that allows for easier collision handling.
     transform.position = transform.position + (this.lastInputVelocity * 0.025f) * this.Speed;
+  }
+
+  public void Score() {
+    this.Points++;
+
+    var message = new {
+      action = "score",
+      points = this.Points
+    };
+
+    AirConsole.instance.Message(this.DeviceID, message);
   }
 
   public void onMessage(JToken data) {
@@ -34,6 +48,6 @@ public class PlayerComponent : MonoBehaviour {
   }
 
   public void onDisconnect() {
-    Destroy(this);
+    Destroy(gameObject);
   }
 }
