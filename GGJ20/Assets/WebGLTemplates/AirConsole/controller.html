@@ -109,10 +109,12 @@
           var ontouchstart = element.getAttribute("ontouchstart");
           if (ontouchstart) {
             element.setAttribute("onmousedown", ontouchstart);
+            element.setAttribute("onmouseenter", ontouchstart);
           }
           var ontouchend = element.getAttribute("ontouchend");
           if (ontouchend) {
             element.setAttribute("onmouseup", ontouchend);
+            element.setAttribute("onmouseleave", ontouchend);
           }
         }
       }
@@ -124,6 +126,11 @@
     };
     App.prototype.move_y = function (value) {
       velocityY = value;
+      window.app.update();
+    };
+    App.prototype.move = function (x, y) {
+      velocityX = x;
+      velocityY = y;
       window.app.update();
     };
 
@@ -160,39 +167,51 @@
       <!-- IRL I would make this a flexbox, but where is the time for that? -->
       <table>
         <tr>
-          <td></td>
+          <td
+            class="action"
+            ontouchstart="window.app.move(-1, 1)"
+            ontouchend="window.app.move(0, 0)"
+          ></td>
           <td
             class="action"
             ontouchstart="window.app.move_y(1)"
             ontouchend="window.app.move_y(0)"
-            onmouseleave="window.app.move_y(0)"
           >UP</td>
-          <td></td>
+          <td
+            class="action"
+            ontouchstart="window.app.move(1, 1)"
+            ontouchend="window.app.move(0, 0)"
+          ></td>
         </tr>
         <tr>
           <td
             class="action"
             ontouchstart="window.app.move_x(-1)"
             ontouchend="window.app.move_x(0)"
-            onmouseleave="window.app.move_x(0)"
           >LEFT</td>
           <td></td>
           <td
             class="action"
             ontouchstart="window.app.move_x(1)"
             ontouchend="window.app.move_x(0)"
-            onmouseleave="window.app.move_x(0)"
           >RIGHT</td>
         </tr>
         <tr>
-          <td></td>
+          <td
+            class="action"
+            ontouchstart="window.app.move(-1, -1)"
+            ontouchend="window.app.move(0, 0)"
+          ></td>
           <td
             class="action"
             ontouchstart="window.app.move_y(-1)"
             ontouchend="window.app.move_y(0)"
-            onmouseleave="window.app.move_y(0)"
           >DOWN</td>
-          <td></td>
+          <td
+            class="action"
+            ontouchstart="window.app.move(1, -1)"
+            ontouchend="window.app.move(0, 0)"
+          ></td>
         </tr>
       </table>
     </div>

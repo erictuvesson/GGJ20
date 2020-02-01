@@ -24,6 +24,7 @@ public class GameLogic : MonoBehaviour {
 
   void onReady(string code) {
     this.Code = code;
+    Debug.Log("Auth Code: " + code);
   }
 
   void onConnect(int deviceID) {
