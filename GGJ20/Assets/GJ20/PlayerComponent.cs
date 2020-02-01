@@ -44,6 +44,6 @@ public class PlayerComponent : MonoBehaviour {
   }
 
   public void onDisconnect() {
-    // TODO: Destroy
+    Destroy(this);
   }
 }
