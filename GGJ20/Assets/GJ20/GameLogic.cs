@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NDream.AirConsole;
@@ -9,9 +10,9 @@ public class GameLogic : MonoBehaviour {
   const int MaxConnections = 20;
 
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
-  private float spawnTimer = 0;
-
   private List<PlaneComponent> planes = new List<PlaneComponent>();
+  private float spawnTimer = 0;
+  private bool playing = false;
 
   public GameObject PlayerPrefab;
   public GameObject PlanePrefab;
@@ -63,6 +64,7 @@ public class GameLogic : MonoBehaviour {
             player.Value.Score();
             this.planes.RemoveAt(i);
             plane.Saved();
+            this.UpdateTotalScore();
             break;
           }
         }
@@ -70,6 +72,11 @@ public class GameLogic : MonoBehaviour {
         i++;
       }
     }
+  }
+
+  void UpdateTotalScore() {
+   var total = this.players.Sum(pair => pair.Value.Points);
+   this.ScoreText.text = "Rescued: " + total;
   }
 
   void OnDrawGizmos() {

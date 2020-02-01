@@ -14,8 +14,7 @@ public class PlaneComponent : MonoBehaviour {
     }
 
     public void Saved() {
-        // Destroy(gameObject);
-
+        this.Speed = 3.0f;
         particleSystem.Stop();
     }
 
