@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 public class GameLogic : MonoBehaviour {
 
-  const int MaxConnections = 4;
+  const int MaxConnections = 20;
 
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
   private float spawnTimer = 0;
@@ -29,10 +29,6 @@ public class GameLogic : MonoBehaviour {
   }
 
   void Update() {
-    if (Input.GetKeyDown("space")) {
-      // var devices = AirConsole.instance.getControllerDeviceIds();
-    }
-
     spawnTimer += Time.deltaTime;
     if (spawnTimer > 3) {
       spawnTimer -= 3;
@@ -73,7 +69,7 @@ public class GameLogic : MonoBehaviour {
       this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
 
       // Get Color
-      var (color, colorName) = PlayerComponent.GetColor(index + 1);
+      var (color, colorName) = GetColor(index);
       this.players[deviceID].Color = color;
 
       var message = new {
@@ -117,5 +113,37 @@ public class GameLogic : MonoBehaviour {
       AirConsole.instance.onDisconnect -= onDisconnect;
       AirConsole.instance.onMessage -= onMessage;
     }
+  }
+
+  (Color, string) GetColor(int index) {
+    switch (index) {
+    default:
+    case 0: return CreateColor("#e6194B", "Red");
+    case 1: return CreateColor("#f58231", "Orange");
+    case 2: return CreateColor("#ffe119", "Yellow");
+    case 3: return CreateColor("#bfef45", "Lime");
+    case 4: return CreateColor("#3cb44b", "Green");
+    case 5: return CreateColor("#42d4f4", "Cyan");
+    case 6: return CreateColor("#4363d8", "Blue");
+    case 7: return CreateColor("#911eb4", "Purple");
+    case 8: return CreateColor("#f032e6", "Magenta");
+    case 9: return CreateColor("#a9a9a9", "Grey");
+    case 10: return CreateColor("#000000", "Black");
+    case 11: return CreateColor("#e6beff", "Lavender");
+    case 12: return CreateColor("#000075", "Navy");
+    case 13: return CreateColor("#469990", "Teal");
+    case 14: return CreateColor("#aaffc3", "Mint");
+    case 15: return CreateColor("#fffac8", "Beige");
+    case 16: return CreateColor("#ffd8b1", "Apricot");
+    case 17: return CreateColor("#fabebe", "Pink");
+    case 18: return CreateColor("#808000", "Olive");
+    case 19: return CreateColor("#9A6324", "Brown");
+    case 20: return CreateColor("#800000", "Maroon");
+    }
+  }
+  
+  private (Color, string) CreateColor(string hex, string name) {
+    ColorUtility.TryParseHtmlString(hex, out var color);
+    return (color, name);
   }
 }
