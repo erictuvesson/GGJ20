@@ -32,11 +32,14 @@ public class GameLogic : MonoBehaviour {
       var prefab = Instantiate(this.PlayerPrefab);
       this.players[deviceID] = prefab.GetComponent<PlayerComponent>();
 
+      var (color, colorName) = PlayerComponent.GetColor(this.players.Count);
+      this.players[deviceID].Color = color;
+
       var message = new {
         action = "connect",
         status = "success",
-        color = "#FF0000",
-        colorName = "Red"
+        color = ColorUtility.ToHtmlStringRGB(color),
+        colorName = colorName
       };
 
       AirConsole.instance.Message(deviceID, message);
