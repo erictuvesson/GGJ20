@@ -19,7 +19,7 @@ public class GameLogic : MonoBehaviour {
     AirConsole.instance.onDisconnect += onDisconnect;
     AirConsole.instance.onMessage += onMessage;
 
-    this.ID = AirConsole.instance.getDeviceId();
+    // this.ID = AirConsole.instance.getDeviceId();
   }
 
   void onConnect(int deviceID) {
