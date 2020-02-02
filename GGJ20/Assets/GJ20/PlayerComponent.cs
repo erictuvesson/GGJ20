@@ -23,7 +23,20 @@ public class PlayerComponent : MonoBehaviour {
   }
 
   void Update() {
+    var min = GameLogic.BBMin;
+    var max = GameLogic.BBMax;
+    
     transform.position = transform.position + (this.lastInputVelocity * 0.025f) * this.Speed;
+
+    // NEVER DO THIS! :D
+    if (!(transform.position.x > min.x && transform.position.x < max.x)) {
+      var newX = Mathf.Clamp(transform.position.x, min.x, max.x);
+      transform.position = new Vector3(newX, transform.position.y, transform.position.z);
+    }
+    if (!(transform.position.z > min.z && transform.position.z < max.z)) {
+      var newZ = Mathf.Clamp(transform.position.z, min.z, max.z);
+      transform.position = new Vector3(transform.position.x, transform.position.y, newZ);
+    }
   }
 
   public string Nickname() {

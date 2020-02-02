@@ -7,6 +7,9 @@ using Newtonsoft.Json.Linq;
 
 public class GameLogic : MonoBehaviour {
 
+  public static Vector3 BBMin;
+  public static Vector3 BBMax;
+
   const int MaxConnections = 20;
 
   private bool connected = false;
@@ -26,6 +29,8 @@ public class GameLogic : MonoBehaviour {
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text ConnectText;
   public GameObject ConnectPanel;
+  public GameObject BoundingBoxMin;
+  public GameObject BoundingBoxMax;
   
   public List<GameObject> PlaneStartPoints = new List<GameObject>();
   public List<GameObject> PlaneEndPoints = new List<GameObject>();
@@ -35,6 +40,11 @@ public class GameLogic : MonoBehaviour {
     AirConsole.instance.onConnect += onConnect;
     AirConsole.instance.onDisconnect += onDisconnect;
     AirConsole.instance.onMessage += onMessage;
+  }
+
+  void Start() {
+    GameLogic.BBMin = BoundingBoxMin.transform.position;
+    GameLogic.BBMax =  BoundingBoxMax.transform.position;
   }
 
   void StartGame() {
@@ -166,11 +176,21 @@ public class GameLogic : MonoBehaviour {
   }
 
   void OnDrawGizmos() {
+    Gizmos.color = Color.white;
     foreach (var start in PlaneStartPoints) {
       foreach (var end in PlaneEndPoints) {
         Gizmos.DrawLine(start.transform.position, end.transform.position);
       }
     }
+    
+    Gizmos.color = Color.red;
+    var minPos = BoundingBoxMin.transform.position;
+    var maxPos = BoundingBoxMax.transform.position;
+
+    Gizmos.DrawLine(new Vector3(minPos.x, 0, minPos.z), new Vector3(maxPos.x, 0, minPos.z));
+    Gizmos.DrawLine(new Vector3(minPos.x, 0, minPos.z), new Vector3(minPos.x, 0, maxPos.z));
+    Gizmos.DrawLine(new Vector3(maxPos.x, 0, maxPos.z), new Vector3(minPos.x, 0, maxPos.z));
+    Gizmos.DrawLine(new Vector3(maxPos.x, 0, maxPos.z), new Vector3(maxPos.x, 0, minPos.z));
   }
 
   void onReady(string code) {
