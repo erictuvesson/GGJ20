@@ -29,6 +29,10 @@ public class GameLogic : MonoBehaviour {
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text ConnectText;
   public GameObject ConnectPanel;
+
+  public GameObject ScoreboardPanel;
+  public UnityEngine.UI.Text ScoreboardText;
+
   public GameObject BoundingBoxMin;
   public GameObject BoundingBoxMax;
   
@@ -45,6 +49,7 @@ public class GameLogic : MonoBehaviour {
   void Start() {
     GameLogic.BBMin = BoundingBoxMin.transform.position;
     GameLogic.BBMax =  BoundingBoxMax.transform.position;
+    this.ScoreboardPanel.SetActive(false);
   }
 
   void StartGame() {
@@ -79,6 +84,17 @@ public class GameLogic : MonoBehaviour {
     };
 
     AirConsole.instance.Broadcast(message);
+
+    // Update scoreboard
+    this.ScoreboardPanel.SetActive(true);
+
+    var players = this.players.OrderBy(e => e.Value.Points).ToArray();
+    var content = "";
+    for (var i = 0; i < players.Length; i++) {
+      var player = players[i].Value;
+      content += "#" + (i + 1) + ". " + player.Nickname() + " (" + player.Points + ")\n";
+    }
+    this.ScoreboardText.text = content;
   }
 
   void Update() {
@@ -170,6 +186,7 @@ public class GameLogic : MonoBehaviour {
   void ReadyCheck() {
     var allReady = this.players.All(pair => pair.Value.ready);
     if (allReady) {
+      this.ScoreboardPanel.SetActive(false);
       this.counter = 3;
       this.counterRun = true;
     }
