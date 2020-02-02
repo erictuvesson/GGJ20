@@ -63,6 +63,12 @@
       color: #ffffff;
     }
 
+    .counter {
+      font-size: 46px;
+      color: #ffffff;
+      text-align: center;
+    }
+
     .controller {
       position: fixed;
       margin: 16px;
@@ -102,12 +108,15 @@
 
     var lastStats = null;
 
-    function reset() {
-      ready = false;
-      color = "gray";
-      colorName = "";
-      velocityX = 0;
-      velocityY = 0;
+    function updateReady() {
+      const readyElem = document.getElementById("ready_button");
+      if (ready) {
+        readyElem.innerHTML = "";
+        readyElem.classList.remove("ready--not");
+      } else {
+        readyElem.innerHTML = "READY";
+        readyElem.classList.add("ready--not");
+      }
     }
 
     function App() {
@@ -142,6 +151,13 @@
             break;
           }
 
+          case "reset": {
+            ready = false;
+
+            updateReady();
+            break;
+          }
+
           case "score": {
             const scoreElem = document.getElementById("info__score");
             scoreElem.innerHTML = "Rescued: " + payload.points;
@@ -151,21 +167,48 @@
           case "stats": {
             lastStats = payload;
 
-            const playersElem1 = document.getElementById("info__players");
-            playersElem1.innerHTML = "Players: " + payload.player_count;
-            const playersElem2 = document.getElementById("info__players_2");
-            playersElem2.innerHTML = "Players: " + payload.player_count;
+            const lobbyElem = document.getElementById("info__lobby");
+            const playingElem = document.getElementById("info__playing");
 
-            var playerStatsContent = "";
-            for (var i = 0; i < payload.player_points.length; i++) {
-              const player = payload.player_points[i];
-              playerStatsContent += "<tr><td>" + player.Item1 + "</td><td>" + player.Item2 + "</td></tr>";
+            const counterElem = document.getElementById("counter");
+            if (payload.counter > 0) {
+              counter.style.display = "block";
+              counter.innerHTML = "<span>" + payload.counter + "...</span>";
+            } else {
+              counter.style.display = "none";
             }
 
-            const playerStatsElem1 = document.getElementById("info__player__stats");
-            playerStatsElem1.innerHTML = playerStatsContent;
-            const playerStatsElem2 = document.getElementById("info__player__stats_2");
-            playerStatsElem2.innerHTML = playerStatsContent;
+            if (payload.state === "playing") {
+              lobbyElem.style.display = "none";
+              playingElem.style.display = "block";
+
+              const playersElem2 = document.getElementById("info__players_2");
+              playersElem2.innerHTML = "Players: " + payload.player_count;
+
+              var playerStatsContent = "";
+              for (var i = 0; i < payload.player_points.length; i++) {
+                const player = payload.player_points[i];
+                playerStatsContent += "<tr><td>" + player.Item1 + "</td><td>" + player.Item2 + "</td></tr>";
+              }
+
+              const playerStatsElem1 = document.getElementById("info__player__stats");
+              playerStatsElem1.innerHTML = playerStatsContent;
+              const playerStatsElem2 = document.getElementById("info__player__stats_2");
+              playerStatsElem2.innerHTML = playerStatsContent;
+
+            } else {
+              lobbyElem.style.display = "block";
+              playingElem.style.display = "none";
+
+              var playerStatsContent = "";
+              for (var i = 0; i < payload.player_ready.length; i++) {
+                const player = payload.player_ready[i];
+                playerStatsContent += "<tr><td>" + player.Item1 + "</td><td>" + player.Item2 + "</td></tr>";
+              }
+
+              const playerStatsElem1 = document.getElementById("info__player__ready");
+              playerStatsElem1.innerHTML = playerStatsContent;
+            }
           }
         }
       };
@@ -209,14 +252,7 @@
         "ready": ready
       });
 
-      const readyElem = document.getElementById("readyButton");
-      if (ready) {
-        readyElem.innerHTML = "";
-        readyElem.classList.remove("ready--not");
-      } else {
-        readyElem.innerHTML = "READY";
-        readyElem.classList.add("ready--not");
-      }
+      updateReady();
     };
 
     App.prototype.move_x = function (value) {
@@ -280,20 +316,36 @@
 
     <div class="info">
       <div class="info__lpanel">
-        <span id="info__players">Players: -</span>
         <span id="info__score">Rescued: -</span>
       </div>
       <div class="info__rpanel">
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Score</th>
-          </tr>
-        </table>
-        <table id="info__player__stats">
-          <!-- Player stats -->
-        </table>
+        <div id="info__lobby">
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Ready</th>
+              </tr>
+            </table>
+            <table id="info__player__ready">
+              <!-- Player stats -->
+            </table>
+        </div>
+        <div id="info__playing">
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </table>
+          <table id="info__player__stats">
+            <!-- Player stats -->
+          </table>
+        </div>
       </div>
+    </div>
+
+    <div id="counter" class="counter">
+      <span>5...</span>
     </div>
 
     <div class="controller">
@@ -323,8 +375,9 @@
             ontouchend="window.app.move_x(0)"
           >LEFT</td>
           <td
+            id="ready_button"
             class="ready ready--not"
-            onclick="window.app.ready"
+            onclick="window.app.ready()"
           >READY</td>
           <td
             class="action"

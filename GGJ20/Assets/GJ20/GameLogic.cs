@@ -9,15 +9,23 @@ public class GameLogic : MonoBehaviour {
 
   const int MaxConnections = 20;
 
+  private bool connected = false;
+
   private Dictionary<int, PlayerComponent> players = new Dictionary<int, PlayerComponent>();
   private List<PlaneComponent> planes = new List<PlaneComponent>();
   private float spawnTimer = 0;
   private bool playing = false;
+  private float gameTimer = 0;
+  private int nextStatsUpdate = 1;
+
+  private float counter = 5;
+  private bool counterRun = false;
 
   public GameObject PlayerPrefab;
   public GameObject PlanePrefab;
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text ConnectText;
+  public GameObject ConnectPanel;
   
   public List<GameObject> PlaneStartPoints = new List<GameObject>();
   public List<GameObject> PlaneEndPoints = new List<GameObject>();
@@ -29,23 +37,75 @@ public class GameLogic : MonoBehaviour {
     AirConsole.instance.onMessage += onMessage;
   }
 
+  void StartGame() {
+    this.playing = true;
+    this.spawnTimer = 0;
+    this.gameTimer = 60;
+    this.ConnectText.gameObject.SetActive(false);
+    this.ConnectPanel.SetActive(false);
+
+    foreach (var player in this.players) {
+      player.Value.Points = 0;
+    }
+
+    UpdateStats();
+  }
+
+  void EndGame() {
+    this.playing = false;
+    this.ConnectText.gameObject.SetActive(true);
+    this.ConnectPanel.SetActive(true);
+
+    foreach (var player in this.players) {
+      player.Value.ready = false;
+    }
+    
+    foreach (var plane in this.planes) {
+      plane.Saved();
+    }
+    
+    var message = new {
+      action = "reset"
+    };
+
+    AirConsole.instance.Broadcast(message);
+  }
+
   void Update() {
-    spawnTimer += Time.deltaTime;
-    if (spawnTimer > 3) {
-      spawnTimer -= 3;
+    // Only spawn when playing
+    if (this.playing) {
+      gameTimer -= Time.deltaTime;
 
-      var planeStartIndex = Random.Range(0, PlaneStartPoints.Count);
-      var planeEndIndex   = Random.Range(0, PlaneEndPoints.Count);
+      spawnTimer += Time.deltaTime;
+      if (spawnTimer > 3) {
+        spawnTimer -= 3;
 
-      var planeStart = PlaneStartPoints[planeStartIndex].transform.position;
-      var planeEnd   = PlaneEndPoints[planeEndIndex].transform.position;
+        var planeStartIndex = Random.Range(0, PlaneStartPoints.Count);
+        var planeEndIndex   = Random.Range(0, PlaneEndPoints.Count);
 
-      var prefab = Instantiate(this.PlanePrefab);
-      var plane  = prefab.GetComponent<PlaneComponent>();
-      prefab.transform.position = planeStart;
-      plane.target = planeEnd;
+        var planeStart = PlaneStartPoints[planeStartIndex].transform.position;
+        var planeEnd   = PlaneEndPoints[planeEndIndex].transform.position;
 
-      planes.Add(plane);
+        var prefab = Instantiate(this.PlanePrefab);
+        var plane  = prefab.GetComponent<PlaneComponent>();
+        prefab.transform.position = planeStart;
+        plane.target = planeEnd;
+
+        planes.Add(plane);
+      }
+
+      if (this.gameTimer <= 0) {
+        EndGame();
+      }
+    } else {
+      if (counterRun) {
+        counter -= Time.deltaTime;
+        if (counter <= 0) {
+          this.counterRun = false;
+          StartGame();
+        }
+        this.UpdateStats();
+      }
     }
 
     for (var i = 0; i < this.planes.Count;) {
@@ -71,6 +131,11 @@ public class GameLogic : MonoBehaviour {
         i++;
       }
     }
+
+    if (connected && Time.time >= nextStatsUpdate) {
+      nextStatsUpdate = Mathf.FloorToInt(Time.time) + 1;
+      this.UpdateStats();
+    }
   }
 
   void UpdateStats() {
@@ -79,13 +144,25 @@ public class GameLogic : MonoBehaviour {
     var message = new {
       action = "stats",
       state = this.playing ? "playing" : "waiting",
+      counter = this.playing ?
+        (this.gameTimer <= 10 ? System.Math.Floor(gameTimer) : -1) :
+        (this.counterRun ? System.Math.Floor(counter) : -1),
       player_count = this.players.Count,
       total_points = total,
-      player_points = this.players.Select(pair => (name: pair.Value.Nickname(), value: pair.Value.Points)).OrderBy(e => e.value),
-      player_ready = this.players.Select(pair => (name: pair.Value.Nickname(), value: pair.Value.ready))
+      player_points = this.players.OrderBy(e => e.Value.Points).Select(pair => (name: pair.Value.Nickname(), value: pair.Value.Points)),
+      player_ready = this.players.Select(pair => (name: pair.Value.Nickname(), value: pair.Value.ready ? "Yes" : "No"))
     };
 
     AirConsole.instance.Broadcast(message);
+  }
+
+  // Check if all players are ready 
+  void ReadyCheck() {
+    var allReady = this.players.All(pair => pair.Value.ready);
+    if (allReady) {
+      this.counter = 3;
+      this.counterRun = true;
+    }
   }
 
   void OnDrawGizmos() {
@@ -97,11 +174,11 @@ public class GameLogic : MonoBehaviour {
   }
 
   void onReady(string code) {
+    this.connected = true;
     this.ConnectText.text = "Connect using code " + code;
   }
 
   void onConnect(int deviceID) {
-    Debug.Log("Connected " + deviceID);
     if (players.Count <= MaxConnections && !this.players.ContainsKey(deviceID)) {
       var index = this.players.Count;
 
@@ -123,7 +200,6 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
-      Debug.Log("Connected; Success " + deviceID);
     } else {
       var message = new {
         action = "connect",
@@ -131,7 +207,6 @@ public class GameLogic : MonoBehaviour {
       };
 
       AirConsole.instance.Message(deviceID, message);
-      Debug.Log("Connected; Failed " + deviceID);
     }
 
     UpdateStats();
@@ -145,9 +220,14 @@ public class GameLogic : MonoBehaviour {
   }
 
   void onMessage(int deviceID, JToken data) {
-    Debug.Log("message from " + deviceID + ", data: " + data);
     if (this.players.TryGetValue(deviceID, out var player)) {
       player.onMessage(data);
+    }
+
+    var action = data["action"].ToObject<string>();
+    if (action == "ready") {
+      this.UpdateStats();
+      this.ReadyCheck();
     }
   }
 

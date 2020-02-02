@@ -54,6 +54,10 @@ public class PlayerComponent : MonoBehaviour {
         var posY = data["y"].ToObject<int>();
         this.lastInputVelocity = new Vector3(posX, 0, posY);
         break;
+
+      case "ready":
+        this.ready = data["ready"].ToObject<bool>();
+        break;
     }
   }
 
