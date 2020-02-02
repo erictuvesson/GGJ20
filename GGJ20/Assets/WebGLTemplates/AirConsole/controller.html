@@ -8,30 +8,58 @@
 
     body {
       margin: 0;
-      margin-top: 32px;
       background-color: #000000;
     }
 
     .header {
       font-size: 24;
-      text-align: center;
+      display: flex;
+      height: 32px;
     }
-
     .header span {
       padding: 16px 0;
       display: block;
       color: #ffffff;
     }
-
+    .header .header__nickname {
+      flex: 1 50%;
+      padding: 6px;
+      text-align: left;
+    }
     .header .header__color {
-      width: 100%;
-      height: 32px;
-      background-color: gray;
+      flex: 1 50%;
+      padding: 6px;
+      text-align: right;
+    }
+
+    .join {
+      font-size: 32px;
+      text-align: center;
+      padding: 16px;
+      margin: 16px;
+      background-color: #006400;
+      color: #ffffff;
     }
 
     .info {
       margin: 16px;
       font-size: 20px;
+      display: flex;
+      color: #ffffff;
+    }
+    .info .info__lpanel,
+    .info .info__rpanel {
+      flex: 1 50%;
+    }
+    .info span {
+      display: block;
+    }
+    .info table {
+      width: 100%;
+    }
+    .info table tr th,
+    .info table tr td {
+      text-align: left;
       color: #ffffff;
     }
 
@@ -54,24 +82,38 @@
       border-radius: 6px;
       text-align: center;
     }
+    .controller table tr td.ready {
+      background-color: green;
+      text-align: center;
+    }
+    .controller table tr td.ready.ready--not {
+      background-color: red;
+    }
 
   </style>
   
   <script type="text/javascript">
 
+    var ready = false;
     var color = "gray";
     var colorName = "";
     var velocityX = 0;
     var velocityY = 0;
 
+    var lastStats = null;
+
+    function reset() {
+      ready = false;
+      color = "gray";
+      colorName = "";
+      velocityX = 0;
+      velocityY = 0;
+    }
+
     function App() {
-
-    /* JavaScript / Functionality. Add functions and evens here */ 
-
       this.airconsole = new AirConsole({ "orientation": "portrait" });
-      
       this.airconsole.onMessage = function (device_id, payload) {
-        console.log("payload: " + payload);
+        console.log("payload: " + JSON.stringify(payload));
 
         switch (payload.action) {
           case "connect": {
@@ -79,8 +121,13 @@
               color = payload.color;
               colorName = payload.colorName;
 
+              const headerElem = document.getElementById("state__header");
+              headerElem.style.background = "#" + payload.color;
+
+              const nicknameElem = document.getElementById("state__nickname");
+              nicknameElem.innerHTML = payload.nickname;
+
               const colorElem = document.getElementById("state__playing__color");
-              colorElem.style.background = "#" + payload.color;
               colorElem.innerHTML = payload.colorName;
 
               document.getElementById("state__connecting").style.display = "none";
@@ -99,6 +146,26 @@
             const scoreElem = document.getElementById("info__score");
             scoreElem.innerHTML = "Rescued: " + payload.points;
             break;
+          }
+
+          case "stats": {
+            lastStats = payload;
+
+            const playersElem1 = document.getElementById("info__players");
+            playersElem1.innerHTML = "Players: " + payload.player_count;
+            const playersElem2 = document.getElementById("info__players_2");
+            playersElem2.innerHTML = "Players: " + payload.player_count;
+
+            var playerStatsContent = "";
+            for (var i = 0; i < payload.player_points.length; i++) {
+              const player = payload.player_points[i];
+              playerStatsContent += "<tr><td>" + player.Item1 + "</td><td>" + player.Item2 + "</td></tr>";
+            }
+
+            const playerStatsElem1 = document.getElementById("info__player__stats");
+            playerStatsElem1.innerHTML = playerStatsContent;
+            const playerStatsElem2 = document.getElementById("info__player__stats_2");
+            playerStatsElem2.innerHTML = playerStatsContent;
           }
         }
       };
@@ -130,6 +197,28 @@
       }
     }
     
+    App.prototype.ready = function () {
+      if (lastStats.state == "playing") {
+        return;
+      }
+
+      ready = !ready;
+
+      this.airconsole.message(AirConsole.SCREEN, {
+        "action": "ready",
+        "ready": ready
+      });
+
+      const readyElem = document.getElementById("readyButton");
+      if (ready) {
+        readyElem.innerHTML = "";
+        readyElem.classList.remove("ready--not");
+      } else {
+        readyElem.innerHTML = "READY";
+        readyElem.classList.add("ready--not");
+      }
+    };
+
     App.prototype.move_x = function (value) {
       velocityX = value;
       window.app.update();
@@ -145,7 +234,6 @@
     };
 
     App.prototype.update = function () {
-      console.log("update velocity [" + velocityX + ", " + velocityY + "]");
       this.airconsole.message(AirConsole.SCREEN, {
         "action": "move",
         "x": velocityX,
@@ -159,18 +247,53 @@
 
   <div id="state__connecting">
     <div class="header">
-      <span>You are not connected yet. :(</span>
+      <span><!-- Some information --></span>
+    </div>
+
+    <div class="info">
+      <div class="info__lpanel">
+        <span id="info__players_2">Players: -</span>
+      </div>
+      <div class="info__rpanel">
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Score</th>
+          </tr>
+        </table>
+        <table id="info__player__stats_2">
+          <!-- Player stats -->
+        </table>
+      </div>
+    </div>
+
+    <div class="join">
+      <span>Click here to join!</span>
     </div>
   </div>
 
   <div id="state__playing" style="display: none;">
-    <div class="header">
-      <span>You are color</span>
+    <div id="state__header" class="header">
+      <div id="state__nickname" class="header__nickname"></div>
       <div id="state__playing__color" class="header__color"></div>
     </div>
 
     <div class="info">
-      <span id="info__score"><!-- more information here  --></span>
+      <div class="info__lpanel">
+        <span id="info__players">Players: -</span>
+        <span id="info__score">Rescued: -</span>
+      </div>
+      <div class="info__rpanel">
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Score</th>
+          </tr>
+        </table>
+        <table id="info__player__stats">
+          <!-- Player stats -->
+        </table>
+      </div>
     </div>
 
     <div class="controller">
@@ -199,7 +322,10 @@
             ontouchstart="window.app.move_x(-1)"
             ontouchend="window.app.move_x(0)"
           >LEFT</td>
-          <td></td>
+          <td
+            class="ready ready--not"
+            onclick="window.app.ready"
+          >READY</td>
           <td
             class="action"
             ontouchstart="window.app.move_x(1)"

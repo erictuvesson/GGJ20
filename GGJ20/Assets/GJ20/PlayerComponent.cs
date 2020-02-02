@@ -7,12 +7,15 @@ using Newtonsoft.Json.Linq;
 public class PlayerComponent : MonoBehaviour {
 
   private Vector3 lastInputVelocity = Vector3.zero;
+  private string nickname;
+
   public Renderer renderComponent;
 
   public int DeviceID;
   public Color Color;
   public float Speed = 2.0f;
   public int Points = 0;
+  public bool ready = false;
 
   void Start() {
     renderComponent = GetComponentInChildren<Renderer>();
@@ -20,8 +23,15 @@ public class PlayerComponent : MonoBehaviour {
   }
 
   void Update() {
-    // TODO: Add rigidbody and move that instead, that allows for easier collision handling.
     transform.position = transform.position + (this.lastInputVelocity * 0.025f) * this.Speed;
+  }
+
+  public string Nickname() {
+    if (string.IsNullOrWhiteSpace(this.nickname)) {
+      this.nickname = AirConsole.instance.GetNickname(this.DeviceID) ?? "No nickname";
+      return this.nickname;
+    }
+    return this.nickname;
   }
 
   public void Score() {

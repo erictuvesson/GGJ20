@@ -18,7 +18,6 @@ public class GameLogic : MonoBehaviour {
   public GameObject PlanePrefab;
   public List<GameObject> SpawnPoints = new List<GameObject>();
   public UnityEngine.UI.Text ConnectText;
-  public UnityEngine.UI.Text ScoreText;
   
   public List<GameObject> PlaneStartPoints = new List<GameObject>();
   public List<GameObject> PlaneEndPoints = new List<GameObject>();
@@ -64,7 +63,7 @@ public class GameLogic : MonoBehaviour {
             player.Value.Score();
             this.planes.RemoveAt(i);
             plane.Saved();
-            this.UpdateTotalScore();
+            this.UpdateStats();
             break;
           }
         }
@@ -74,9 +73,19 @@ public class GameLogic : MonoBehaviour {
     }
   }
 
-  void UpdateTotalScore() {
+  void UpdateStats() {
    var total = this.players.Sum(pair => pair.Value.Points);
-   this.ScoreText.text = "Rescued: " + total;
+
+    var message = new {
+      action = "stats",
+      state = this.playing ? "playing" : "waiting",
+      player_count = this.players.Count,
+      total_points = total,
+      player_points = this.players.Select(pair => (name: pair.Value.Nickname(), value: pair.Value.Points)).OrderBy(e => e.value),
+      player_ready = this.players.Select(pair => (name: pair.Value.Nickname(), value: pair.Value.ready))
+    };
+
+    AirConsole.instance.Broadcast(message);
   }
 
   void OnDrawGizmos() {
@@ -109,7 +118,8 @@ public class GameLogic : MonoBehaviour {
         action = "connect",
         status = "success",
         color = ColorUtility.ToHtmlStringRGB(color),
-        colorName = colorName
+        colorName = colorName,
+        nickname = this.players[deviceID].Nickname()
       };
 
       AirConsole.instance.Message(deviceID, message);
@@ -123,6 +133,8 @@ public class GameLogic : MonoBehaviour {
       AirConsole.instance.Message(deviceID, message);
       Debug.Log("Connected; Failed " + deviceID);
     }
+
+    UpdateStats();
   }
 
   void onDisconnect(int deviceID) {
