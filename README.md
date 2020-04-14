@@ -1,5 +1,5 @@
 # GGJ20
-Jam Game made for [GGJ 2020](https://globalgamejam.org/)
+Unity3D Game made for [GGJ 2020](https://globalgamejam.org/)
 
 This was a game that was developed in less than 24 hours as I was rather busy that weekend with other things.
 
